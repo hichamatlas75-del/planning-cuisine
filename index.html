@@ -61,6 +61,7 @@ header h1{
   font-weight:800;
   color:var(--gold);
   font-size:15px;
+  text-transform:capitalize;
 }
 
 .teams{
@@ -74,12 +75,14 @@ header h1{
   background:rgba(12,26,53,0.35);
   border-radius:14px;
   padding:10px;
+  border:1px solid rgba(255,255,255,0.06);
 }
 
 .teamTitle{
   font-weight:800;
   color:#ffd77d;
   margin-bottom:8px;
+  font-size:13px;
 }
 
 .pills{ display:flex; flex-wrap:wrap; gap:6px; }
@@ -90,6 +93,7 @@ header h1{
   border-radius:999px;
   font-size:12px;
   font-weight:700;
+  border:1px solid rgba(255,255,255,0.06);
 }
 
 .pill.off{
@@ -102,47 +106,53 @@ header h1{
 <body>
 
 <header>
-  <img src="images/logo.png">
+  <img src="images/logo.png" alt="Logo">
   <h1>Planning Cuisine Ramadan</h1>
 </header>
 
 <div id="planning"></div>
 
 <script>
-
 /* ===== NOMS ===== */
 const equipeMatin = ["Khaoula","Fatima","Imane"];
-const equipeSoir  = ["Naoual","Jihane","Jawad","Anas"];
+const equipeSoir  = ["Naoual","Jihane","Jawad","Anas","Saad"]; // <-- soir = 5
 
 /* ===== DATES ===== */
-const start = new Date(2026,2,2);
-const end   = new Date(2026,2,19);
+const start = new Date(2026,2,2);  // 02 mars 2026
+const end   = new Date(2026,2,19); // 19 mars 2026
 
-const container=document.getElementById("planning");
-const todayStr=new Date().toDateString();
+const container = document.getElementById("planning");
+const todayStr  = new Date().toDateString();
 
-let indexMatin=0;
-let indexSoir=0;
+/* Rotation OFF: 1 OFF matin + 1 OFF soir / jour */
+let indexMatin = 0;
+let indexSoir  = 0;
 
 for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
 
-  const offMatin=equipeMatin[indexMatin % equipeMatin.length];
-  const offSoir=equipeSoir[indexSoir % equipeSoir.length];
+  const offMatin = equipeMatin[indexMatin % equipeMatin.length];
+  const offSoir  = equipeSoir[indexSoir  % equipeSoir.length];
 
   indexMatin++;
   indexSoir++;
 
-  const card=document.createElement("div");
-  card.className="day";
-  if(d.toDateString()===todayStr){
-      card.classList.add("today");
-      setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"center"}),400);
+  const card = document.createElement("div");
+  card.className = "day";
+
+  if(d.toDateString() === todayStr){
+    card.classList.add("today");
+    setTimeout(()=>card.scrollIntoView({behavior:"smooth", block:"center"}), 400);
   }
 
-  const matinHTML=equipeMatin.map(n=>`<span class="pill ${n===offMatin?'off':''}">${n}${n===offMatin?' (OFF)':''}</span>`).join("");
-  const soirHTML=equipeSoir.map(n=>`<span class="pill ${n===offSoir?'off':''}">${n}${n===offSoir?' (OFF)':''}</span>`).join("");
+  const matinHTML = equipeMatin
+    .map(n => `<span class="pill ${n===offMatin?'off':''}">${n}${n===offMatin?' (OFF)':''}</span>`)
+    .join("");
 
-  card.innerHTML=`
+  const soirHTML = equipeSoir
+    .map(n => `<span class="pill ${n===offSoir?'off':''}">${n}${n===offSoir?' (OFF)':''}</span>`)
+    .join("");
+
+  card.innerHTML = `
     <div class="top">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
 
     <div class="teams">
