@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Planning Cuisine • Ramadan</title>
+  <meta name="theme-color" content="#0b3b2e" />
+  <style>
+    :root{
+      --bg:#f7f3ea;
+      --card:#ffffff;
+      --ink:#102018;
+      --muted:#51615a;
+      --green:#0b3b2e;
+      --green2:#0f5a45;
+      --gold:#caa24d;
+      --gold2:#f2d58a;
+      --ring: rgba(202,162,77,.35);
+      --shadow: 0 10px 30px rgba(16,32,24,.10);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(202,162,77,.18), transparent 60%),
+        radial-gradient(900px 500px at 95% 0%, rgba(15,90,69,.14), transparent 55%),
+        linear-gradient(180deg, #fffaf0 0%, var(--bg) 40%, #f5f1e7 100%);
+      -webkit-font-smoothing: antialiased;
+      overflow-x:hidden;
+    }
+
+    /* Décor subtil "ramadan" */
+    .pattern{
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 20px 20px, rgba(202,162,77,.10) 2px, transparent 3px) 0 0/42px 42px,
+        radial-gradient(circle at 20px 20px, rgba(11,59,46,.07) 1px, transparent 3px) 12px 18px/54px 54px;
+      opacity:.35;
+      mix-blend-mode:multiply;
+    }
+
+    .app{
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 14px 14px 28px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    /* Header compact mobile */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(247,243,234,.78);
+      border-bottom: 1px solid rgba(16,32,24,.06);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 14px;
+      max-width: 860px;
+      margin:0 auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; min-width:0;
+    }
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(16,32,24,.08);
+      display:grid; place-items:center;
+      overflow:hidden;
+      border: 1px solid rgba(16,32,24,.06);
+      flex: 0 0 auto;
+    }
+    .logo img{width:100%; height:100%; object-fit:contain; display:block}
+    .titles{min-width:0}
+    .titles .h1{
+      font-weight: 800;
+      letter-spacing:.2px;
+      font-size: 14px;
+      line-height: 1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .titles .sub{
+      margin-top:2px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .chip{
+      flex: 0 0 auto;
+      font-size:12px;
+      padding:8px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffffff, #fbf6ea);
+      border: 1px solid rgba(202,162,77,.35);
+      box-shadow: 0 10px 24px rgba(202,162,77,.12);
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .controls{
+      display:flex; gap:8px; margin: 12px 0 14px;
+    }
+    .btn{
+      border:0;
+      background: var(--card);
+      border: 1px solid rgba(16,32,24,.08);
+      box-shadow: 0 8px 22px rgba(16,32,24,.06);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      color: var(--green);
+      cursor:pointer;
+      min-height: 40px;
+      touch-action: manipulation;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btn.secondary{
+      color: var(--ink);
+      background: rgba(255,255,255,.75);
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+
+    .day{
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(16,32,24,.06);
+      overflow:hidden;
+      scroll-margin-top: 90px;
+      position: relative;
+    }
+
+    .day::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(500px 120px at 0% 0%, rgba(242,213,138,.35), transparent 60%),
+        radial-gradient(460px 120px at 100% 0%, rgba(15,90,69,.18), transparent 60%);
+      pointer-events:none;
+    }
+
+    .day-inner{
+      position:relative;
+      padding: 12px 12px 12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .day-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .datebox{
+      display:flex; flex-direction:column; gap:2px; min-width:0;
+    }
+    .datebox .d{
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing:.2px;
+    }
+    .datebox .meta{
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    .week{
+      font-size:12px;
+      font-weight: 800;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(11,59,46,.16);
+      background: rgba(11,59,46,.06);
+      color: var(--green);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .block{
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+      border: 1px solid rgba(16,32,24,.06);
+      border-radius: 16px;
+      padding: 10px 10px;
+    }
+    .label{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+    }
+    .label .t{
+      font-size:12px;
+      font-weight: 900;
+      color: var(--green2);
+      letter-spacing:.3px;
+      text-transform: uppercase;
+    }
+    .badge{
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(202,162,77,.16);
+      border: 1px solid rgba(202,162,77,.28);
+      color: #6b4b10;
+    }
+
+    .names{
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 700;
+      color: var(--ink);
+      word-wrap:break-word;
+    }
+    .muted{
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    /* Highlight "Jour J" */
+    .day.today{
+      border-color: rgba(202,162,77,.65);
+      box-shadow: 0 18px 44px rgba(202,162,77,.18);
+      outline: 3px solid var(--ring);
+    }
+    .today-flag{
+      position:absolute;
+      top: 10px;
+      right: 12px;
+      z-index: 2;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .4px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--gold2), var(--gold));
+      color: #1a1408;
+      border: 1px solid rgba(26,20,8,.12);
+      box-shadow: 0 12px 26px rgba(202,162,77,.22);
+    }
+
+    /* Desktop: 2 blocs côte à côte si besoin */
+    @media (min-width: 720px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+      .titles .h1{ font-size: 15px; }
+    }
+
+    .footer-note{
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(81,97,90,.9);
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="pattern" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo" title="Logo">
+          <!-- Mettre votre fichier ici : /images/logo.png -->
+          <img src="images/logo.png" alt="Logo" onerror="this.style.display='none'; this.parentElement.textContent='GC'; this.parentElement.style.fontWeight='900'; this.parentElement.style.color='var(--green)';" />
+        </div>
+        <div class="titles">
+          <div class="h1">Planning Cuisine • Ramadan</div>
+          <div class="sub" id="subLine">Vignettes quotidiennes • scroll auto Jour J</div>
+        </div>
+      </div>
+      <div class="chip" id="chipToday">—</div>
+    </div>
+  </header>
+
+  <main class="app">
+    <div class="controls">
+      <button class="btn" id="btnToday" type="button">Aller à اليوم (Jour J)</button>
+      <button class="btn secondary" id="btnNext" type="button">Prochain jour</button>
+    </div>
+
+    <section class="list" id="list" aria-label="Planning par jour"></section>
+
+    <div class="footer-note">Astuce: pour changer le planning, modifie les données JS en bas du fichier.</div>
+  </main>
+
+  <script>
+    // Données (importées depuis votre fichier Excel)
+    const PLANNING = [
+      {"date":"2026-03-02","jour":"Lun","semaine":"1","presents":"Fatima, Imane","off":"Khaoula"},
+      {"date":"2026-03-03","jour":"Mar","semaine":"1","presents":"Khaoula, Imane","off":"Fatima"},
+      {"date":"2026-03-04","jour":"Mer","semaine":"1","presents":"Khaoula, Fatima","off":"Imane"},
+      {"date":"2026-03-05","jour":"Jeu","semaine":"1","presents":"Fatima, Imane","off":"Khaoula"},
+      {"date":"2026-03-06","jour":"Ven","semaine":"1","presents":"Khaoula, Imane","off":"Fatima"},
+      {"date":"2026-03-07","jour":"Sam","semaine":"1","presents":"Khaoula, Fatima","off":"Imane"},
+      {"date":"2026-03-08","jour":"Dim","semaine":"1","presents":"Fatima, Imane","off":"Khaoula"},
+      {"date":"2026-03-09","jour":"Lun","semaine":"2","presents":"Naoual, Jihane, Jawad, Saad","off":"Anas"},
+      {"date":"2026-03-10","jour":"Mar","semaine":"2","presents":"Anas, Jihane, Jawad, Saad","off":"Naoual"},
+      {"date":"2026-03-11","jour":"Mer","semaine":"2","presents":"Naoual, Anas, Jawad, Saad","off":"Jihane"},
+      {"date":"2026-03-12","jour":"Jeu","semaine":"2","presents":"Naoual, Jihane, Anas, Saad","off":"Jawad"},
+      {"date":"2026-03-13","jour":"Ven","semaine":"2","presents":"Naoual, Jihane, Jawad, Anas","off":"Saad"},
+      {"date":"2026-03-14","jour":"Sam","semaine":"2","presents":"Anas, Jihane, Jawad, Saad","off":"Naoual"},
+      {"date":"2026-03-15","jour":"Dim","semaine":"2","presents":"Naoual, Jihane, Jawad, Saad","off":"Anas"},
+      {"date":"2026-03-16","jour":"Lun","semaine":"3","presents":"Saad, Jihane, Jawad, Anas","off":"Naoual"},
+      {"date":"2026-03-17","jour":"Mar","semaine":"3","presents":"Jihane, Jawad, Anas, Naoual","off":"Saad"},
+      {"date":"2026-03-18","jour":"Mer","semaine":"3","presents":"Naoual, Jawad, Anas, Saad","off":"Jihane"},
+      {"date":"2026-03-19","jour":"Jeu","semaine":"3","presents":"Naoual, Jihane, Anas, Saad","off":"Jawad"}
+    ];
+
+    const $list = document.getElementById("list");
+    const $chip = document.getElementById("chipToday");
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+    function localISODate(d){
+      const y = d.getFullYear();
+      const m = pad2(d.getMonth()+1);
+      const day = pad2(d.getDate());
+      return `${y}-${m}-${day}`;
+    }
+    function prettyDate(iso){
+      // iso = YYYY-MM-DD
+      const [y,m,d] = iso.split("-").map(Number);
+      const dt = new Date(y, m-1, d);
+      const opts = { weekday:"long", year:"numeric", month:"long", day:"numeric" };
+      return dt.toLocaleDateString("fr-FR", opts);
+    }
+
+    function render(){
+      $list.innerHTML = "";
+      const todayISO = localISODate(new Date());
+      $chip.textContent = `Aujourd'hui: ${todayISO}`;
+
+      PLANNING.forEach(item=>{
+        const card = document.createElement("article");
+        card.className = "day";
+        card.dataset.date = item.date;
+
+        const isToday = (item.date === todayISO);
+        if(isToday) card.classList.add("today");
+
+        card.innerHTML = `
+          ${isToday ? `<div class="today-flag">Jour J</div>` : ``}
+          <div class="day-inner">
+            <div class="day-top">
+              <div class="datebox">
+                <div class="d">${item.jour} • ${item.date}</div>
+                <div class="meta">${prettyDate(item.date)}</div>
+              </div>
+              <div class="week">Semaine ${item.semaine}</div>
+            </div>
+
+            <div class="grid">
+              <div class="block">
+                <div class="label">
+                  <div class="t">Équipe</div>
+                  <div class="badge">Présents</div>
+                </div>
+                <div class="names">${escapeHTML(item.presents || "—")}</div>
+              </div>
+
+              <div class="block">
+                <div class="label">
+                  <div class="t">Rotation</div>
+                  <div class="badge">OFF</div>
+                </div>
+                <div class="names muted">${escapeHTML(item.off || "—")}</div>
+              </div>
+            </div>
+          </div>
+        `;
+        $list.appendChild(card);
+      });
+    }
+
+    function escapeHTML(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function scrollToDay(iso, behavior="smooth"){
+      const el = document.querySelector(`.day[data-date="${iso}"]`);
+      if(!el) return false;
+      el.scrollIntoView({ behavior, block:"center" });
+      return true;
+    }
+
+    function scrollToToday(behavior="smooth"){
+      const todayISO = localISODate(new Date());
+      // 1) si "Jour J" existe
+      if(scrollToDay(todayISO, behavior)) return;
+
+      // 2) sinon: prochain jour futur, sinon: premier
+      const future = PLANNING.find(x => x.date > todayISO);
+      if(future && scrollToDay(future.date, behavior)) return;
+      if(PLANNING[0]) scrollToDay(PLANNING[0].date, behavior);
+    }
+
+    function nextDay(){
+      const todayISO = localISODate(new Date());
+      // si on est sur un jour du planning, prendre le suivant; sinon prochain futur
+      const idx = PLANNING.findIndex(x => x.date === todayISO);
+      if(idx >= 0 && PLANNING[idx+1]) return PLANNING[idx+1].date;
+      const future = PLANNING.find(x => x.date > todayISO);
+      return (future ? future.date : (PLANNING[0]?.date || null));
+    }
+
+    // Auto-scroll "Jour J" (au chargement + si la date change)
+    function startAutoFocus(){
+      let lastISO = localISODate(new Date());
+      scrollToToday("auto"); // immédiat
+
+      setInterval(()=>{
+        const nowISO = localISODate(new Date());
+        if(nowISO !== lastISO){
+          lastISO = nowISO;
+          render();
+          scrollToToday("smooth");
+        }
+      }, 30_000);
+    }
+
+    // Boutons
+    document.getElementById("btnToday").addEventListener("click", ()=> scrollToToday("smooth"));
+    document.getElementById("btnNext").addEventListener("click", ()=>{
+      const nd = nextDay();
+      if(nd) scrollToDay(nd, "smooth");
+    });
+
+    // Init
+    render();
+    // petit délai pour garantir le layout avant scroll
+    requestAnimationFrame(()=> setTimeout(startAutoFocus, 60));
+  </script>
+</body>
+</html>
