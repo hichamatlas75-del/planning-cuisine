@@ -1,131 +1,211 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Planning Cuisine Ramadan</title>
 
 <style>
 :root{
-    --gold:#d4a94f;
-    --night:#0c1324;
-    --card:#111b33;
-    --text:#f4f1e6;
+  --gold:#d4a94f;
+  --bg1:#1c2a52;
+  --bg2:#070b18;
+  --card1:#111b33;
+  --card2:#0b1428;
+  --text:#f4f1e6;
+  --pill:#0c1a35;
+  --off:#ff6b6b;
 }
 
+/* Ramadan background */
 body{
-    margin:0;
-    font-family:"Segoe UI",Tahoma,sans-serif;
-    color:var(--text);
-    background:radial-gradient(circle at top,#1c2a52,#070b18 70%);
+  margin:0;
+  font-family:"Segoe UI",Tahoma,sans-serif;
+  color:var(--text);
+  background:radial-gradient(circle at top,var(--bg1),var(--bg2) 70%);
 }
 
+/* Compact header */
 header{
-    text-align:center;
-    padding:12px 10px 5px;
+  text-align:center;
+  padding:10px 10px 6px;
 }
-header img{height:70px;}
+header img{ height:64px; display:block; margin:0 auto 6px; }
 header h1{
-    margin:0;
-    font-size:22px;
-    letter-spacing:2px;
-    color:var(--gold);
+  margin:0;
+  font-size:20px;
+  letter-spacing:1.5px;
+  color:var(--gold);
 }
 
+/* Vertical full-width list */
 #planning{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-    gap:12px;
-    padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:12px;
 }
 
+/* Full-width day card */
 .day{
-    background:linear-gradient(180deg,var(--card),#0b1428);
-    border-radius:14px;
-    padding:10px;
-    box-shadow:0 0 0 1px rgba(255,215,120,0.12),
-               0 6px 18px rgba(0,0,0,0.6);
+  width:100%;
+  background:linear-gradient(180deg,var(--card1),var(--card2));
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 0 0 1px rgba(255,215,120,0.12),
+             0 10px 22px rgba(0,0,0,0.55);
+  scroll-margin-top:90px;
 }
 
 .today{
-    outline:2px solid var(--gold);
-    transform:scale(1.05);
+  outline:2px solid var(--gold);
 }
 
+/* Date row */
+.top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
 .date{
-    text-align:center;
-    font-weight:700;
-    color:var(--gold);
-    margin-bottom:8px;
-    font-size:15px;
+  font-weight:800;
+  color:var(--gold);
+  font-size:15px;
+  text-transform:capitalize;
 }
 
-.team{margin-top:6px;font-size:13px;}
-.team b{display:block;margin-bottom:3px;color:#ffd77d;}
+/* OFF badge */
+.offBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,107,107,0.14);
+  color:#ffd7d7;
+  border:1px solid rgba(255,107,107,0.35);
+  font-weight:700;
+  font-size:12px;
+  white-space:nowrap;
+}
 
-.person{
-    background:#0c1a35;
-    padding:4px 6px;
-    border-radius:8px;
-    margin:3px 0;
-    text-align:center;
-    font-size:12px;
+/* Teams */
+.teams{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media (max-width:520px){
+  .teams{ grid-template-columns:1fr; }
+}
+
+.team{
+  background:rgba(12,26,53,0.35);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:10px;
+}
+.teamTitle{
+  font-weight:800;
+  color:#ffd77d;
+  margin:0 0 8px;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.pill{
+  background:var(--pill);
+  border:1px solid rgba(255,255,255,0.06);
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+  line-height:1;
+}
+
+/* OFF pills inside teams */
+.pill.off{
+  background:rgba(255,107,107,0.12);
+  border-color:rgba(255,107,107,0.35);
+  color:#ffd7d7;
 }
 </style>
 </head>
 <body>
 
 <header>
-    <img src="images/logo.png">
-    <h1>Planning Cuisine Ramadan</h1>
+  <img src="images/logo.png" alt="Logo">
+  <h1>Planning Cuisine Ramadan</h1>
 </header>
 
 <div id="planning"></div>
 
 <script>
-
-/* ======= TOUS LES NOMS ======= */
+/* ======= NOMS ======= */
 const equipeMatin = ["Khaoula","Fatima","Imane"];
 const equipeSoir  = ["Naoual","Jihane","Jawad","Anas"];
 
 /* ======= DATES ======= */
-const start = new Date(2026,2,2);
-const end   = new Date(2026,2,19);
+const start = new Date(2026,2,2);   // 02 mars 2026
+const end   = new Date(2026,2,19);  // 19 mars 2026
 
-const container=document.getElementById("planning");
-const todayStr=new Date().toDateString();
+/* ======= OFF (1 jour chacun à tour de rôle) =======
+   - Un seul OFF par jour, tournant sur la liste complète.
+*/
+const allNames = [...equipeMatin, ...equipeSoir];
+function offForDay(dayIndex){
+  return allNames[dayIndex % allNames.length];
+}
 
-for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+const container = document.getElementById("planning");
+const todayStr = new Date().toDateString();
 
-    const card=document.createElement("div");
-    card.className="day";
+let dayIndex = 0;
 
-    if(d.toDateString()===todayStr){
-        card.classList.add("today");
-        setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"center"}),400);
-    }
+for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1), dayIndex++){
 
-    let matinHTML="";
-    equipeMatin.forEach(n=> matinHTML+=`<div class="person">${n}</div>`);
+  const offName = offForDay(dayIndex);
 
-    let soirHTML="";
-    equipeSoir.forEach(n=> soirHTML+=`<div class="person">${n}</div>`);
+  const card = document.createElement("div");
+  card.className = "day";
+  if(d.toDateString() === todayStr){
+    card.classList.add("today");
+    setTimeout(()=>card.scrollIntoView({behavior:"smooth", block:"center"}), 400);
+  }
 
-    card.innerHTML=`
-        <div class="date">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
+  // Build pills with OFF marking
+  const pillsMatin = equipeMatin.map(n => `<span class="pill ${n===offName?'off':''}">${n}${n===offName?' (OFF)':''}</span>`).join("");
+  const pillsSoir  = equipeSoir .map(n => `<span class="pill ${n===offName?'off':''}">${n}${n===offName?' (OFF)':''}</span>`).join("");
 
-        <div class="team">
-            <b>Équipe matin</b>
-            ${matinHTML}
-        </div>
+  card.innerHTML = `
+    <div class="top">
+      <div class="date">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
+      <div class="offBadge">OFF : ${offName}</div>
+    </div>
 
-        <div class="team">
-            <b>Équipe soir</b>
-            ${soirHTML}
-        </div>
-    `;
+    <div class="teams">
+      <div class="team">
+        <div class="teamTitle">Équipe matin</div>
+        <div class="pills">${pillsMatin}</div>
+      </div>
 
-    container.appendChild(card);
+      <div class="team">
+        <div class="teamTitle">Équipe soir</div>
+        <div class="pills">${pillsSoir}</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(card);
 }
 </script>
 </body>
