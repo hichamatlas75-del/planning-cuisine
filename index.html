@@ -17,7 +17,6 @@
   --off:#ff6b6b;
 }
 
-/* Ramadan background */
 body{
   margin:0;
   font-family:"Segoe UI",Tahoma,sans-serif;
@@ -25,7 +24,6 @@ body{
   background:radial-gradient(circle at top,var(--bg1),var(--bg2) 70%);
 }
 
-/* Compact header */
 header{
   text-align:center;
   padding:10px 10px 6px;
@@ -38,7 +36,6 @@ header h1{
   color:var(--gold);
 }
 
-/* Vertical full-width list */
 #planning{
   display:flex;
   flex-direction:column;
@@ -46,7 +43,6 @@ header h1{
   padding:12px;
 }
 
-/* Full-width day card */
 .day{
   width:100%;
   background:linear-gradient(180deg,var(--card1),var(--card2));
@@ -54,88 +50,51 @@ header h1{
   padding:12px;
   box-shadow:0 0 0 1px rgba(255,215,120,0.12),
              0 10px 22px rgba(0,0,0,0.55);
-  scroll-margin-top:90px;
 }
 
-.today{
-  outline:2px solid var(--gold);
-}
+.today{ outline:2px solid var(--gold); }
 
-/* Date row */
 .top{
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:10px;
   margin-bottom:10px;
-}
-.date{
   font-weight:800;
   color:var(--gold);
   font-size:15px;
-  text-transform:capitalize;
 }
 
-/* OFF badge */
-.offBadge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(255,107,107,0.14);
-  color:#ffd7d7;
-  border:1px solid rgba(255,107,107,0.35);
-  font-weight:700;
-  font-size:12px;
-  white-space:nowrap;
-}
-
-/* Teams */
 .teams{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
 }
-@media (max-width:520px){
-  .teams{ grid-template-columns:1fr; }
-}
+@media (max-width:520px){ .teams{ grid-template-columns:1fr; } }
 
 .team{
   background:rgba(12,26,53,0.35);
-  border:1px solid rgba(255,255,255,0.06);
   border-radius:14px;
   padding:10px;
 }
+
 .teamTitle{
   font-weight:800;
   color:#ffd77d;
-  margin:0 0 8px;
-  font-size:13px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
+  margin-bottom:8px;
 }
-.pills{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-}
+
+.pills{ display:flex; flex-wrap:wrap; gap:6px; }
+
 .pill{
   background:var(--pill);
-  border:1px solid rgba(255,255,255,0.06);
   padding:6px 10px;
   border-radius:999px;
   font-size:12px;
   font-weight:700;
-  line-height:1;
 }
 
-/* OFF pills inside teams */
 .pill.off{
-  background:rgba(255,107,107,0.12);
-  border-color:rgba(255,107,107,0.35);
+  background:rgba(255,107,107,0.18);
+  border:1px solid rgba(255,107,107,0.45);
   color:#ffd7d7;
 }
 </style>
@@ -143,64 +102,58 @@ header h1{
 <body>
 
 <header>
-  <img src="images/logo.png" alt="Logo">
+  <img src="images/logo.png">
   <h1>Planning Cuisine Ramadan</h1>
 </header>
 
 <div id="planning"></div>
 
 <script>
-/* ======= NOMS ======= */
+
+/* ===== NOMS ===== */
 const equipeMatin = ["Khaoula","Fatima","Imane"];
 const equipeSoir  = ["Naoual","Jihane","Jawad","Anas"];
 
-/* ======= DATES ======= */
-const start = new Date(2026,2,2);   // 02 mars 2026
-const end   = new Date(2026,2,19);  // 19 mars 2026
+/* ===== DATES ===== */
+const start = new Date(2026,2,2);
+const end   = new Date(2026,2,19);
 
-/* ======= OFF (1 jour chacun à tour de rôle) =======
-   - Un seul OFF par jour, tournant sur la liste complète.
-*/
-const allNames = [...equipeMatin, ...equipeSoir];
-function offForDay(dayIndex){
-  return allNames[dayIndex % allNames.length];
-}
+const container=document.getElementById("planning");
+const todayStr=new Date().toDateString();
 
-const container = document.getElementById("planning");
-const todayStr = new Date().toDateString();
+let indexMatin=0;
+let indexSoir=0;
 
-let dayIndex = 0;
+for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
 
-for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1), dayIndex++){
+  const offMatin=equipeMatin[indexMatin % equipeMatin.length];
+  const offSoir=equipeSoir[indexSoir % equipeSoir.length];
 
-  const offName = offForDay(dayIndex);
+  indexMatin++;
+  indexSoir++;
 
-  const card = document.createElement("div");
-  card.className = "day";
-  if(d.toDateString() === todayStr){
-    card.classList.add("today");
-    setTimeout(()=>card.scrollIntoView({behavior:"smooth", block:"center"}), 400);
+  const card=document.createElement("div");
+  card.className="day";
+  if(d.toDateString()===todayStr){
+      card.classList.add("today");
+      setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"center"}),400);
   }
 
-  // Build pills with OFF marking
-  const pillsMatin = equipeMatin.map(n => `<span class="pill ${n===offName?'off':''}">${n}${n===offName?' (OFF)':''}</span>`).join("");
-  const pillsSoir  = equipeSoir .map(n => `<span class="pill ${n===offName?'off':''}">${n}${n===offName?' (OFF)':''}</span>`).join("");
+  const matinHTML=equipeMatin.map(n=>`<span class="pill ${n===offMatin?'off':''}">${n}${n===offMatin?' (OFF)':''}</span>`).join("");
+  const soirHTML=equipeSoir.map(n=>`<span class="pill ${n===offSoir?'off':''}">${n}${n===offSoir?' (OFF)':''}</span>`).join("");
 
-  card.innerHTML = `
-    <div class="top">
-      <div class="date">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
-      <div class="offBadge">OFF : ${offName}</div>
-    </div>
+  card.innerHTML=`
+    <div class="top">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
 
     <div class="teams">
       <div class="team">
-        <div class="teamTitle">Équipe matin</div>
-        <div class="pills">${pillsMatin}</div>
+        <div class="teamTitle">Équipe matin — OFF : ${offMatin}</div>
+        <div class="pills">${matinHTML}</div>
       </div>
 
       <div class="team">
-        <div class="teamTitle">Équipe soir</div>
-        <div class="pills">${pillsSoir}</div>
+        <div class="teamTitle">Équipe soir — OFF : ${offSoir}</div>
+        <div class="pills">${soirHTML}</div>
       </div>
     </div>
   `;
