@@ -7,13 +7,11 @@
 
 <style>
 :root{
-  --gold:#d4a94f;
   --bg1:#1c2a52;
   --bg2:#070b18;
-  --card1:#111b33;
-  --card2:#0b1428;
   --text:#f4f1e6;
   --pill:#0c1a35;
+  --gold:#d4a94f;
   --off:#ff6b6b;
 }
 
@@ -25,43 +23,100 @@ body{
 }
 
 header{
+  position:sticky;
+  top:0;
+  z-index:10;
   text-align:center;
-  padding:10px 10px 6px;
+  padding:10px 10px 8px;
+  background:linear-gradient(180deg, rgba(7,11,24,0.92), rgba(7,11,24,0.55));
+  backdrop-filter: blur(8px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
 }
-header img{ height:64px; display:block; margin:0 auto 6px; }
+header img{ height:56px; display:block; margin:0 auto 6px; }
 header h1{
   margin:0;
-  font-size:20px;
-  letter-spacing:1.5px;
+  font-size:18px;
+  letter-spacing:1.2px;
   color:var(--gold);
 }
 
 #planning{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:14px;
   padding:12px;
 }
 
+/* Vignette plus longue */
 .day{
   width:100%;
-  background:linear-gradient(180deg,var(--card1),var(--card2));
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 0 0 1px rgba(255,215,120,0.12),
-             0 10px 22px rgba(0,0,0,0.55);
+  border-radius:18px;
+  padding:14px;
+  min-height:190px;            /* <-- plus longue */
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08),
+    0 12px 26px rgba(0,0,0,0.55);
+  scroll-margin-top:110px;     /* <-- pour scroll au jour J (avec header sticky) */
+  position:relative;
+  overflow:hidden;
 }
 
-.today{ outline:2px solid var(--gold); }
+/* Bande colorée */
+.day::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg, var(--c1), var(--c2));
+  opacity:0.90;
+}
+.day::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at top, rgba(255,255,255,0.10), rgba(0,0,0,0.35) 70%);
+}
+
+.content{
+  position:relative;
+  z-index:2;
+}
+
+/* Aujourd'hui */
+.today{
+  outline:2px solid rgba(255,215,125,0.95);
+  transform:scale(1.01);
+}
 
 .top{
   display:flex;
+  align-items:center;
   justify-content:space-between;
+  gap:10px;
   margin-bottom:10px;
-  font-weight:800;
-  color:var(--gold);
+}
+.date{
+  font-weight:900;
   font-size:15px;
   text-transform:capitalize;
+  letter-spacing:0.2px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:12px;
+  white-space:nowrap;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(0,0,0,0.22);
+}
+
+.badge.off{
+  border-color:rgba(255,107,107,0.55);
+  color:#ffd7d7;
 }
 
 .teams{
@@ -72,33 +127,35 @@ header h1{
 @media (max-width:520px){ .teams{ grid-template-columns:1fr; } }
 
 .team{
-  background:rgba(12,26,53,0.35);
+  background:rgba(0,0,0,0.20);
+  border:1px solid rgba(255,255,255,0.12);
   border-radius:14px;
   padding:10px;
-  border:1px solid rgba(255,255,255,0.06);
 }
 
 .teamTitle{
-  font-weight:800;
-  color:#ffd77d;
+  font-weight:900;
   margin-bottom:8px;
   font-size:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
 }
 
 .pills{ display:flex; flex-wrap:wrap; gap:6px; }
 
 .pill{
-  background:var(--pill);
-  padding:6px 10px;
+  background:rgba(12,26,53,0.75);
+  border:1px solid rgba(255,255,255,0.10);
+  padding:7px 10px;
   border-radius:999px;
   font-size:12px;
-  font-weight:700;
-  border:1px solid rgba(255,255,255,0.06);
+  font-weight:800;
 }
 
 .pill.off{
   background:rgba(255,107,107,0.18);
-  border:1px solid rgba(255,107,107,0.45);
+  border-color:rgba(255,107,107,0.55);
   color:#ffd7d7;
 }
 </style>
@@ -115,61 +172,96 @@ header h1{
 <script>
 /* ===== NOMS ===== */
 const equipeMatin = ["Khaoula","Fatima","Imane"];
-const equipeSoir  = ["Naoual","Jihane","Jawad","Anas","Saad"]; // <-- soir = 5
+const equipeSoir  = ["Naoual","Jihane","Jawad","Anas","Saad"];
 
 /* ===== DATES ===== */
 const start = new Date(2026,2,2);  // 02 mars 2026
 const end   = new Date(2026,2,19); // 19 mars 2026
 
+/* ===== COULEURS (1 couleur par jour, cycle) ===== */
+const dayColors = [
+  ["#ffb703","#fb8500"], // orange
+  ["#06d6a0","#1b9aaa"], // turquoise
+  ["#3a86ff","#8338ec"], // bleu/violet
+  ["#ff006e","#ffbe0b"], // rose/jaune
+  ["#8ac926","#1982c4"], // vert/bleu
+  ["#ffd6a5","#fdffb6"], // pastel
+  ["#ffadad","#caffbf"], // doux
+  ["#4cc9f0","#4361ee"], // océan
+];
+
+/* OFF: 1 OFF matin + 1 OFF soir / jour (rotation indépendante) */
+let idxMatin = 0;
+let idxSoir  = 0;
+
 const container = document.getElementById("planning");
-const todayStr  = new Date().toDateString();
+const today = new Date();
+const todayKey = today.toDateString();
 
-/* Rotation OFF: 1 OFF matin + 1 OFF soir / jour */
-let indexMatin = 0;
-let indexSoir  = 0;
+let todayCard = null;
+let dayIndex = 0;
 
-for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1), dayIndex++) {
 
-  const offMatin = equipeMatin[indexMatin % equipeMatin.length];
-  const offSoir  = equipeSoir[indexSoir  % equipeSoir.length];
+  const offMatin = equipeMatin[idxMatin % equipeMatin.length];
+  const offSoir  = equipeSoir[idxSoir  % equipeSoir.length];
+  idxMatin++; idxSoir++;
 
-  indexMatin++;
-  indexSoir++;
+  const [c1,c2] = dayColors[dayIndex % dayColors.length];
 
   const card = document.createElement("div");
   card.className = "day";
+  card.style.setProperty("--c1", c1);
+  card.style.setProperty("--c2", c2);
 
-  if(d.toDateString() === todayStr){
+  if (d.toDateString() === todayKey) {
     card.classList.add("today");
-    setTimeout(()=>card.scrollIntoView({behavior:"smooth", block:"center"}), 400);
+    todayCard = card;
   }
 
-  const matinHTML = equipeMatin
-    .map(n => `<span class="pill ${n===offMatin?'off':''}">${n}${n===offMatin?' (OFF)':''}</span>`)
-    .join("");
+  const matinHTML = equipeMatin.map(n =>
+    `<span class="pill ${n===offMatin?'off':''}">${n}${n===offMatin?' (OFF)':''}</span>`
+  ).join("");
 
-  const soirHTML = equipeSoir
-    .map(n => `<span class="pill ${n===offSoir?'off':''}">${n}${n===offSoir?' (OFF)':''}</span>`)
-    .join("");
+  const soirHTML = equipeSoir.map(n =>
+    `<span class="pill ${n===offSoir?'off':''}">${n}${n===offSoir?' (OFF)':''}</span>`
+  ).join("");
 
   card.innerHTML = `
-    <div class="top">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
-
-    <div class="teams">
-      <div class="team">
-        <div class="teamTitle">Équipe matin — OFF : ${offMatin}</div>
-        <div class="pills">${matinHTML}</div>
+    <div class="content">
+      <div class="top">
+        <div class="date">${d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}</div>
+        <div class="badge">Couleur du jour</div>
       </div>
 
-      <div class="team">
-        <div class="teamTitle">Équipe soir — OFF : ${offSoir}</div>
-        <div class="pills">${soirHTML}</div>
+      <div class="teams">
+        <div class="team">
+          <div class="teamTitle">
+            <span>Équipe matin</span>
+            <span class="badge off">OFF : ${offMatin}</span>
+          </div>
+          <div class="pills">${matinHTML}</div>
+        </div>
+
+        <div class="team">
+          <div class="teamTitle">
+            <span>Équipe soir</span>
+            <span class="badge off">OFF : ${offSoir}</span>
+          </div>
+          <div class="pills">${soirHTML}</div>
+        </div>
       </div>
     </div>
   `;
 
   container.appendChild(card);
 }
+
+/* Scroll automatique au jour J */
+setTimeout(() => {
+  if (todayCard) todayCard.scrollIntoView({behavior:"smooth", block:"start"});
+}, 450);
 </script>
+
 </body>
 </html>
